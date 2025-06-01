@@ -1,0 +1,33 @@
+name: Schedule Railway Service
+
+on:
+  schedule:
+    # 毎日18:00 JST → 09:00 UTC（Railwayを起動）
+    - cron: '0 9 * * *'
+    # 毎日24:00 JST → 15:00 UTC（Railwayを停止）
+    - cron: '0 15 * * *'
+
+jobs:
+  start-stop-railway:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start/Stop Railway Service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          PROJECT_ID: 0d897935-f7b2-46fb-89bc-cbaad742b4ba
+          SERVICE_ID: 71dbf314-9ddd-4d10-bd54-327c7a04540e
+        run: |
+          TIME_UTC=$(date -u +"%H")
+          if [ "$TIME_UTC" -eq 9 ]; then
+            echo "▶️ Starting service..."
+            curl -X POST \
+              -H "Authorization: Bearer $RAILWAY_TOKEN" \
+              https://backboard.railway.app/project/$PROJECT_ID/service/$SERVICE_ID/enable
+          elif [ "$TIME_UTC" -eq 15 ]; then
+            echo "⏹️ Stopping service..."
+            curl -X POST \
+              -H "Authorization: Bearer $RAILWAY_TOKEN" \
+              https://backboard.railway.app/project/$PROJECT_ID/service/$SERVICE_ID/disable
+          else
+            echo "⏰ Not a scheduled time."
+          fi
