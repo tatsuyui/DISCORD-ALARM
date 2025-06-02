@@ -47,7 +47,7 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
     const userCount = actualUsers.length;
 
     // 1～2人のときは通知しない
-    if (userCount < 3 || usercount ===5) return;
+    if (userCount < 3 || userCount ===5) return;
 
     // 3人以上の場合だけ参加通知
     await sendLineMessage(`🔔 ${user} が ${channel} に参加しました（現在 ${userCount} 人）`);
